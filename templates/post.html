@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ author.get_full_name }}{% endblock %}
+{% block header %}{{ author.get_full_name }}{% endblock %}
+{% block content %}
+{% load user_filters %}
+
+    <div class="h2">@{{ author.username }}</div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="h6 text-muted">
+                Подписчиков: XXX <br/>
+                Подписан: XXX
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="h6 text-muted">
+                Записей: {{ author.posts.count }}
+            </div>
+        </li>
+    </ul>
+
+    <div class="col-md-9">
+        <div class="card mb-3 mt-1 shadow-sm">
+            {% include "includes/post_item.html" with post=post %}
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+        <div class="card my-4">
+            <form method="post" action="{% url 'add_comment' post.author.username post.id %}">
+                {% csrf_token %}
+                <h5 class="card-header">Добавить комментарий:</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        {{ form.text|addclass:"form-control" }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
+<!-- Комментарии -->
+    {% for item in comments %}
+        <div class="media card mb-4">
+            <div class="media-body card-body">
+                <h5 class="mt-0">
+                    <a href="{% url 'profile' item.author.username %}">
+                        {{ item.author.username }}
+                    </a>
+                </h5>
+                <p>{{ item.text | linebreaksbr }}</p>
+                <small class="text-muted">{{ item.created }}</small>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
