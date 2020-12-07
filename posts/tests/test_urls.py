@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post, User
+from posts.models import Follow, Group, Post, User
 
 
 class StaticURLTests(TestCase):
@@ -69,9 +69,13 @@ class StaticURLTests(TestCase):
         post_edit_url = reverse(
                 'post_edit', kwargs={'username': 'author', 'post_id': 1}
         )
+        comment_url = reverse(
+                'add_comment', kwargs={'username': 'author', 'post_id': 1}
+        )
         url_to_login = {
             new_post_url: f"{login_url}?next={new_post_url}",
             post_edit_url: f"{login_url}?next={post_edit_url}",
+            comment_url: f"{login_url}?next={comment_url}",
         }
         for url, next_url in url_to_login.items():
             with self.subTest():
@@ -99,11 +103,19 @@ class StaticURLTests(TestCase):
 
     def test_new_for_authorized_user(self):
         """
-        Страница /new/ доступна
+        Страница /new/ и /<str:username>/<int:post_id>/comment/ доступна
         авторизованному пользователю.
         """
-        response = self.authorized_client.get(reverse('new_post'))
-        self.assertEqual(response.status_code, 200)
+        url_status_code = {
+            reverse('new_post'),
+            reverse(
+                'add_comment', kwargs={'username': 'author', 'post_id': 1}
+            ),
+        }
+        for url in url_status_code:
+            with self.subTest():
+                response = self.authorized_client.get(url)
+                self.assertEqual(response.status_code, 200)
 
     def test_url_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -115,6 +127,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post', kwargs={'username': 'author', 'post_id': 1}
             ): 'post.html',
+            reverse('follow_index'): 'follow.html',
         }
         for url, template in url_uses_templates.items():
             with self.subTest():
@@ -139,3 +152,42 @@ class StaticURLTests(TestCase):
         """
         response = self.guest_client.get('/not-found/')
         self.assertEqual(response.status_code, 404)
+
+    def test_auth_user_follow_unfollow(self):
+        """
+        Авторизованный пользователь может подписываться
+         на других пользователей и удалять их из подписок
+        """
+        self.authorized_client.get(reverse(
+            'profile_follow', kwargs={'username': 'author'}
+        ))
+        self.assertEqual(
+            Follow.objects.filter(user=StaticURLTests.user).count(),
+            1
+        )
+        self.authorized_client.get(reverse(
+            'profile_unfollow', kwargs={'username': 'author'}
+        ))
+        self.assertEqual(
+            Follow.objects.filter(user=StaticURLTests.user).count(),
+            0
+        )
+
+    def test_show_follow_posts(self):
+        """
+        Новая запись пользователя появляется в ленте тех, кто на него подписан
+        и не появляется в ленте тех, кто не подписан на него.
+        """
+        self.authorized_client.get(reverse(
+            'profile_follow', kwargs={'username': 'author'}
+        ))
+        self.assertEqual(
+            Post.objects.filter(
+                author__following__user=StaticURLTests.user).count(), 1
+        )
+        self.assertEqual(
+            Post.objects.filter(
+                author__following__user=StaticURLTests.author).count(), 0
+        )
+
+

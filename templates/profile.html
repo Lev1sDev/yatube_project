@@ -1,16 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Пользователь {{ user1.get_full_name }}{% endblock %}
-{% block header %}{{ user1.get_full_name }}{% endblock %}
+{% block title %}Пользователь {{ author.get_full_name }}{% endblock %}
+{% block header %}{{ author.get_full_name }}{% endblock %}
 {% block content %}
 
-<div class="h2" xmlns="http://www.w3.org/1999/html">@{{ user1.username }}</div>
+<div class="h2" xmlns="http://www.w3.org/1999/html">@{{ author.username }}</div>
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
             <div class="h6 text-muted">
-                Подписчиков: XXX <br/>
-                Подписан: XXX
+                Подписчиков: {{ followers }} <br/>
+                Подписан: {{ follow }}
             </div>
+        </li>
+        <li class="list-group-item">
+            {% if following %}
+                <a class="btn btn-lg btn-light"
+                    href="{% url 'profile_unfollow' author.username %}" role="button">
+                    Отписаться
+                </a>
+            {% elif not following and author != user %}
+                <a class="btn btn-lg btn-primary"
+                    href="{% url 'profile_follow' author.username %}" role="button">
+                    Подписаться
+                </a>
+            {% endif %}
         </li>
         <li class="list-group-item">
             <div class="h6 text-muted">

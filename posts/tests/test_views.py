@@ -84,6 +84,7 @@ class PostsPagesTests(TestCase):
             ('post.html', reverse(
                 'post', kwargs={'username': 'leo', 'post_id': 1}
             )),
+            ('follow.html', reverse('follow_index')),
         )
         for template, reverse_name in templates_page_names:
             with self.subTest(template=template):
@@ -135,9 +136,9 @@ class PostsPagesTests(TestCase):
         response = self.guest_client.get(
             reverse('profile', kwargs={'username': 'leo'})
         )
-        self.assertEqual(response.context.get('user1').username, 'leo')
+        self.assertEqual(response.context.get('author').username, 'leo')
         self.assertEqual(
-            response.context.get('user1').get_full_name(), 'Лев Толстой'
+            response.context.get('author').get_full_name(), 'Лев Толстой'
         )
 
     def test_post_show_correct_context(self):

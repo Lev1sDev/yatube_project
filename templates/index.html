@@ -3,7 +3,7 @@
 {% block header %}Последние обновления на сайте{% endblock %}
 
     {% block content %}
-
+        {% include "includes/menu.html" with index=True %}
         {% load cache %}
 
         {% cache 20 index_page page %}
