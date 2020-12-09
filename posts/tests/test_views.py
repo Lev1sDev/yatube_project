@@ -159,7 +159,9 @@ class PostsPagesTests(TestCase):
         self.assertEqual(response.context.get('post').id, 1)
         self.assertEqual(response.context.get('post').text, 'Текст')
         self.assertEqual(response.context.get('post').pub_date, pub_date)
-        self.assertEqual(response.context.get('comments').count(), 1)
+        self.assertEqual(
+            response.context.get('comments').first().text, 'Коммент'
+        )
         self.assertIsNotNone(response.context.get('post').image)
 
     def test_new_post_show_correct_context(self):
