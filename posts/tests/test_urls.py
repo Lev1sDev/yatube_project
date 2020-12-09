@@ -17,12 +17,11 @@ class StaticURLTests(TestCase):
             slug='test-slug',
         )
         Post.objects.create(
-            id=1,
             text='Текст',
             author=cls.author,
             group=cls.group
         )
-        cls.site = Site.objects.get(pk=1)
+        cls.site = Site.objects.first()
         cls.flatpages1 = FlatPage.objects.create(
             url='/about-author/',
             title='Об авторе',
@@ -153,10 +152,10 @@ class StaticURLTests(TestCase):
         response = self.guest_client.get('/not-found/')
         self.assertEqual(response.status_code, 404)
 
-    def test_auth_user_follow_unfollow(self):
+    def test_auth_user_follow(self):
         """
         Авторизованный пользователь может подписываться
-         на других пользователей и удалять их из подписок
+        на других пользователей
         """
         self.authorized_client.get(reverse(
             'profile_follow', kwargs={'username': 'author'}
@@ -165,6 +164,12 @@ class StaticURLTests(TestCase):
             Follow.objects.filter(user=StaticURLTests.user).count(),
             1
         )
+
+    def test_auth_user_unfollow(self):
+        """
+        Авторизованный пользователь может удалять из подписок
+        других пользователей
+        """
         self.authorized_client.get(reverse(
             'profile_unfollow', kwargs={'username': 'author'}
         ))

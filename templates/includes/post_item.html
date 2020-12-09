@@ -27,14 +27,14 @@
       <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
               <a class="btn btn-sm btn-primary mr-2"
-                 href="{% url 'post' post.author.username post.id %}" role="button">
+                 href="{% url 'post' post.author.username post.id %}"
+                 role="button">
                   {% if user.is_authenticated %}
                       Добавить комментарий
                   {% else %}
                       Посмотреть комментарии
                   {% endif %}
               </a>
-
               {% if user == post.author %}
                   <a class="btn btn-sm btn-info"
                      href="{% url 'post_edit' post.author.username post.id %}" role="button">

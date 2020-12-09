@@ -8,10 +8,9 @@ class GroupModelTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         Group.objects.create(
-            id=1,
             title='Котики',
         )
-        cls.group = Group.objects.get(id=1)
+        cls.group = Group.objects.first()
 
     def test_object_name_is_title_field(self):
         """
@@ -30,11 +29,10 @@ class PostModelTest(TestCase):
             username='new_user'
         )
         Post.objects.create(
-            id=1,
             author=cls.user,
             text='Какой-то текст',
         )
-        cls.post = Post.objects.get(id=1)
+        cls.post = Post.objects.first()
 
     def test_verbose_name(self):
         """verbose_name в полях совпадает с ожидаемым."""
@@ -42,6 +40,7 @@ class PostModelTest(TestCase):
         field_verboses = {
             'text': 'Текст',
             'group': 'Группа',
+            'image': 'Изображение',
         }
         for value, expected in field_verboses.items():
             with self.subTest(value=value):

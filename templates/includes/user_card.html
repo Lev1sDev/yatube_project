@@ -1,0 +1,30 @@
+<div class="h2">@{{ author.username }}</div>
+
+<ul class="list-group list-group-flush">
+    <li class="list-group-item">
+        <div class="h6 text-muted">
+            Подписчиков: {{ followers }} <br/>
+            Подписан: {{ follow }}
+        </div>
+    </li>
+    <li class="list-group-item">
+        {% if following %}
+        <a class="btn btn-lg btn-light"
+           href="{% url 'profile_unfollow' author.username %}"
+           role="button">
+            Отписаться
+        </a>
+        {% elif not following and author != user %}
+        <a class="btn btn-lg btn-primary"
+           href="{% url 'profile_follow' author.username %}"
+           role="button">
+            Подписаться
+        </a>
+        {% endif %}
+    </li>
+    <li class="list-group-item">
+        <div class="h6 text-muted">
+            Записей: {{ author.posts.count }}
+        </div>
+    </li>
+</ul>

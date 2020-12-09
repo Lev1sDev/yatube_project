@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post, User
+from posts.models import Comment, Group, Post, User
 
 
 class PostsPagesTests(TestCase):
@@ -34,19 +34,24 @@ class PostsPagesTests(TestCase):
             first_name='Лев',
             last_name='Толстой',
         )
+        cls.user2 = User.objects.create_user('user')
         cls.group = Group.objects.create(
             title='Котики',
             description='О котиках',
             slug='test-slug',
         )
         cls.post = Post.objects.create(
-            id=1,
             text='Текст',
             author=cls.user,
             group=cls.group,
             image=cls.uploaded,
         )
-        cls.site = Site.objects.get(pk=1)
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            text='Коммент',
+            author=cls.user2
+        )
+        cls.site = Site.objects.first()
         cls.flatpages1 = FlatPage.objects.create(
             url='/about-author/',
             title='Об авторе',
@@ -154,6 +159,7 @@ class PostsPagesTests(TestCase):
         self.assertEqual(response.context.get('post').id, 1)
         self.assertEqual(response.context.get('post').text, 'Текст')
         self.assertEqual(response.context.get('post').pub_date, pub_date)
+        self.assertEqual(response.context.get('comments').count(), 1)
         self.assertIsNotNone(response.context.get('post').image)
 
     def test_new_post_show_correct_context(self):
