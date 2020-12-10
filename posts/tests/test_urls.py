@@ -59,8 +59,10 @@ class StaticURLTests(TestCase):
 
     def test_url_redirect_anonymous_on_login(self):
         """
-        Страница по адресу /new/ и
-        /<str:username>/<int:post_id>/edit/ перенаправит анонимного
+        Страница по адресу /new/,
+        /<str:username>/<int:post_id>/edit/ и
+        /<str:username>/<int:post_id>/comment/
+        перенаправит анонимного
         пользователя на страницу логина.
         """
         login_url = reverse('login')

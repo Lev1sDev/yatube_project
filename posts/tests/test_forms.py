@@ -76,7 +76,7 @@ class PostCreateFormTests(TestCase):
             'image': uploaded,
         }
         response = self.authorized_client.post(
-            '/new/',
+            reverse('new_post'),
             data=form,
             follow=True
         )
@@ -91,73 +91,92 @@ class PostCreateFormTests(TestCase):
         ]
         self.assertFormError(response, 'form', 'image', error)
 
-        @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-        def test_post_edit(self):
-            small_gif = (
-                b'\x47\x49\x46\x38\x39\x61\x01\x00'
-                b'\x01\x00\x00\x00\x00\x21\xf9\x04'
-                b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
-                b'\x00\x00\x01\x00\x01\x00\x00\x02'
-                b'\x02\x4c\x01\x00\x3b'
-            )
-            uploaded = SimpleUploadedFile(
-                name='small1.gif',
-                content=small_gif,
-                content_type='image/gif'
-            )
-            group = Group.objects.create(
-                title='Котики',
-                description='О котиках',
-                slug='test-slug',
-            )
-            Post.objects.create(
-                text='Какой-то текст',
-                author=self.user
-            )
-            posts_count = Post.objects.count()
-            form_data = {
-                'group': group.id,
-                'text': 'Текст',
-                'image': uploaded,
-            }
-            response = self.authorized_client.post(
-                reverse('post_edit', kwargs={'username': 'leo', 'post_id': 1}),
-                data=form_data,
-                follow=True
-            )
-            self.assertRedirects(response, reverse(
-                'post', kwargs={'username': 'leo', 'post_id': 1}
-            ))
-            self.assertEqual(Post.objects.count(), posts_count)
-            self.assertEqual(Post.objects.first().text, 'Текст')
-            self.assertEqual(Post.objects.first().group.title, 'Котики')
-            self.assertIsNotNone(Post.objects.first().image)
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_post_edit(self):
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x01\x00'
+            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
+            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
+            b'\x00\x00\x01\x00\x01\x00\x00\x02'
+            b'\x02\x4c\x01\x00\x3b'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small1.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
+        group = Group.objects.create(
+            title='Котики',
+            description='О котиках',
+            slug='test-slug',
+        )
+        Post.objects.create(
+            text='Какой-то текст',
+            author=self.user
+        )
+        posts_count = Post.objects.count()
+        form_data = {
+            'group': group.id,
+            'text': 'Текст',
+            'image': uploaded,
+        }
+        response = self.authorized_client.post(
+            reverse('post_edit', kwargs={'username': 'leo', 'post_id': 1}),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'post', kwargs={'username': 'leo', 'post_id': 1}
+        ))
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertEqual(Post.objects.first().text, 'Текст')
+        self.assertEqual(Post.objects.first().group.title, 'Котики')
+        self.assertIsNotNone(Post.objects.first().image)
 
-    class CommentCreateForm(TestCase):
-        def setUp(self):
-            self.author = User.objects.create_user('leo')
-            self.user = User.objects.create_user('user')
-            self.authorized_client_author = Client()
-            self.authorized_client = Client()
-            self.authorized_client_author.force_login(self.author)
-            self.authorized_client.force_login(self.user)
 
-        def test_create_comment(self):
-            comments_count = Comment.objects.count()
-            Post.objects.create(
-                author=self.author,
-                text='Пост'
-            )
-            form_data = {
-                'text': 'Текст',
-            }
-            response = self.authorized_client.post(
-                reverse('add_comment',
-                        kwargs={'username': 'leo', 'post_id': 1}),
-                data=form_data,
-                follow=True
-            )
-            self.assertRedirects(response, reverse(
-                'post', kwargs={'username': 'leo', 'post_id': 1}
-            ))
-            self.assertEqual(Comment.objects.count(), comments_count + 1)
+class CommentCreateForm(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user('leo')
+        cls.user = User.objects.create_user('user')
+        Post.objects.create(
+            author=cls.author,
+            text='Пост'
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.author = CommentCreateForm.author
+        self.user = CommentCreateForm.user
+        self.authorized_client_author = Client()
+        self.authorized_client = Client()
+        self.authorized_client_author.force_login(self.author)
+        self.authorized_client.force_login(self.user)
+
+    def test_authorized_client_create_comment(self):
+        comments_count = Comment.objects.count()
+        form_data = {
+            'text': 'Текст',
+        }
+        response = self.authorized_client.post(
+            reverse('add_comment', kwargs={'username': 'leo', 'post_id': 1}),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'post', kwargs={'username': 'leo', 'post_id': 1}
+        ))
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+
+    def test_guest_client_cannot_create_comment(self):
+        comments_count = Comment.objects.count()
+        form_data = {
+            'text': 'Текст',
+        }
+        self.guest_client.post(
+            reverse('add_comment', kwargs={'username': 'leo', 'post_id': 1}),
+            data=form_data,
+            follow=True
+        )
+        self.assertEqual(Comment.objects.count(), comments_count)
