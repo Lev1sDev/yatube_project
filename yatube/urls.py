@@ -20,8 +20,8 @@ urlpatterns = [
     path('', include('posts.urls')),
 ]
 
-handler404 = 'posts.views.page_not_found' # noqa
-handler500 = 'posts.views.server_error' # noqa
+handler404 = 'posts.views.page_not_found'  # noqa
+handler500 = 'posts.views.server_error'  # noqa
 
 if settings.DEBUG:
     urlpatterns += static(
@@ -30,3 +30,6 @@ if settings.DEBUG:
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
+    import debug_toolbar
+
+    urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)
