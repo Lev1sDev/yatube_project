@@ -6,7 +6,7 @@
 
 ### Ссылка на сайт: https://www.westnet.cf/
 
-### Установка приложения:
+### Локальная установка приложения:
 ```git clone https://github.com/Lev1sDev/yatube_project.git``` \
 ```python3 -m venv venv``` \
 ```source venv/bin/activate``` \
