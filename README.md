@@ -12,13 +12,17 @@
 ```source venv/bin/activate``` \
 ```pip install -r requirements.txt```
 
-### Выполнить миграции
+### Выполнить миграции:
 ```python3 manage.py makemigrations``` \
 ```python3 manage.py migrate```
 
-### Создать суперпользователя и заполнить базу начальными данными
+### Создать суперпользователя и заполнить базу начальными данными:
 ```python3 manage.py createsuperuser``` \
 ```python3 manage.py loaddata dump.json```
 
-### Запуск приложения
+### Подключить статические и медиа файлы:
+```python3 manage.py collectstatic```\
+```python3 manage.py collectmedia```
+
+### Запуск приложения:
 ```python3 manage.py runserver```
