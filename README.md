@@ -7,17 +7,17 @@
 ### Ссылка на сайт: https://www.westnet.cf/
 
 ### Установка приложения:
-```git clone https://github.com/Lev1sDev/yatube_project.git```
-```python3 -m venv venv```
-```source venv/bin/activate```
+```git clone https://github.com/Lev1sDev/yatube_project.git``` \
+```python3 -m venv venv``` \
+```source venv/bin/activate``` \
 ```pip install -r requirements.txt```
 
 ### Выполнить миграции
-```python3 manage.py makemigrations```
+```python3 manage.py makemigrations``` \
 ```python3 manage.py migrate```
 
 ### Создать суперпользователя и заполнить базу начальными данными
-```python3 manage.py createsuperuser```
+```python3 manage.py createsuperuser``` \
 ```python3 manage.py loaddata dump.json```
 
 ### Запуск приложения
