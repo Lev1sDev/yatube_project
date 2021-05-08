@@ -1,6 +1,6 @@
 # Yatube - социальная сеть для публикации дневников
 
-## Стек технологий: Python 3, Django 2.2, PostgreSQL, gunicorn, nginx, Яндекс.Облако (Ubuntu 18.04), pytest.
+## Стек технологий: Python 3, Django 2.2, PostgreSQL, Docker, gunicorn, nginx, Яндекс.Облако (Ubuntu 18.04), pytest.
 
 ### Используется пагинация постов и кэширование. Реализована регистрация пользователей с верификацией данных, сменой и восстановлением пароля через почту. Написаны тесты, проверяющие работу сервиса
 
@@ -21,4 +21,4 @@
 ```docker-compose exec web python manage.py collectstatic --no-input```
 
 ### Заполнить базу начальными данными:
-```docker-compose exec web python manage.py loaddata fixtures.json```
+```docker-compose exec web python manage.py loaddata dump.json```
