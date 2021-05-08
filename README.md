@@ -6,23 +6,19 @@
 
 ### Ссылка на сайт: https://www.westnet.cf/
 
-### Локальная установка приложения:
-```git clone https://github.com/Lev1sDev/yatube_project.git``` \
-```python3 -m venv venv``` \
-```source venv/bin/activate``` \
-```pip install -r requirements.txt```
+### Запуск приложения:
+``` git clone https://github.com/Lev1sDev/yatube_project.git  ``` \
+```docker-compose up```
 
 ### Выполнить миграции:
-```python3 manage.py makemigrations``` \
-```python3 manage.py migrate```
+```docker-compose exec web python manage.py makemigrations``` \
+```docker-compose exec web python manage.py migrate --noinput```
 
-### Создать суперпользователя и заполнить базу начальными данными:
-```python3 manage.py createsuperuser``` \
-```python3 manage.py loaddata dump.json```
+### Создать суперпользователя:
+```docker-compose exec web python manage.py createsuperuser```
 
-### Подключить статические и медиа файлы:
-```python3 manage.py collectstatic```\
-```python3 manage.py collectmedia```
+### Привязать статические файлы:
+```docker-compose exec web python manage.py collectstatic --no-input```
 
-### Запуск приложения:
-```python3 manage.py runserver```
+### Заполнить базу начальными данными:
+```docker-compose exec web python manage.py loaddata fixtures.json```
